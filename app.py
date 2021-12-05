@@ -9,36 +9,30 @@ app = Flask(__name__)
 CORS(app)
 run_with_ngrok(app)
 
-ovocie = ["jablko","pomaranc","jahoda"]
+ovocie = ["jablko","pomaranc"]
 
 @app.route("/", methods = ["GET"])
 def main():
-  myDb = MYSQL.connect(host = "147.232.40.14", user = "ok529nk", passwd = "Aiphu60C", database = "ok529nk")
-  cursor = myDb.cursor()
-  cursor.execute("SELECT Nazov from Ovocie")
-  result = cursor.fetchall()
-  cursor.close()
-  vysledok = []
-  for i in result:
-    vysledok.append('{'+'{}'.format(i[0])+'}')
-  vys = []
-  for i in range(len(vysledok)):
-    vys.append(eval(vysledok[k]))
-  myDb.close()
-  slovnik = {"ovocie":vys}
+  slovnik = {"ovocie":ovocie}
   return jsonify(slovnik),200
 
+@app.route("/vytvorit", methods = ["POST"])
+def create():
+  data = request.get_json(force=True)
+  data_dict = dict(data)
+  ovocie.append(data_dict["vytvorit"])
+  return jsonify("created"),201
 
 @app.route("/upravit/<id>", methods = ["PUT"])
 def update(id):
   data = request.get_json(force=True)
   data_dict = dict(data)
   ovocie[int(id)]= data_dict["upravit"]
-  return jsonify("updated"),201
+  return jsonify(updated),201
 
-@app.route("/vymazat/<id>", methods = ["DELETE"])
+@app.route("/delete/<id>", methods = ["DELETE"])
 def delete(id):
-  del ovocie[int(id)]
-  return jsonify("deleted"),204
+  ovocie[int(id)]= None
+  return jsonify(updated),204
 
 app.run()
